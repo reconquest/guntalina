@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/docopt/docopt-go"
 )
@@ -14,7 +14,12 @@ const (
 	usage = `Guntalina
 
 Usage:
-	guntalina -s <path> -r <path>
+	./guntalina -s <source> -c <config>
+
+Options:
+	-s <source>    Source file
+	-c <config     Config file
+
 `
 )
 
@@ -26,9 +31,11 @@ func main() {
 
 	var (
 		sourcePath = args["-s"].(string)
-		rulesPath  = args["-r"].(string)
+		configPath = args["-c"].(string)
 	)
 
-	fmt.Printf("XXXXXX main.go:29: sourcePath: %#v\n", sourcePath)
-	fmt.Printf("XXXXXX main.go:29: rulesPath: %#v\n", rulesPath)
+	_, err = getConfig(configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
