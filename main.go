@@ -49,12 +49,7 @@ func main() {
 		strings.TrimSuffix(string(modificationsData), "\n"), "\n",
 	)
 
-	config, err := getConfig(configPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	actions, rules, err := config.Initialize()
+	actions, rules, err := parseConfig(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}

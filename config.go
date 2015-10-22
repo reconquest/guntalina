@@ -8,25 +8,32 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type Config struct {
-	Actions map[string]Action `yaml:"actions"`
-	Rules   *Rules            `yaml:"rules"`
+type Action struct {
+	Name     string   `yaml:"name"`
+	Commands []string `yaml:"commands"`
 }
 
-func getConfig(path string) (*Config, error) {
+type Actions map[string]Action
+
+type config struct {
+	Actions Actions `yaml:"actions"`
+	Rules   *Rules  `yaml:"rules"`
+}
+
+func parseConfig(path string) (Actions, *Rules, error) {
 	yamlData, err := loadYaml(path, filepath.Dir(path))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	//uncomment for debug
+	// uncomment for debug
 	//fmt.Printf("%s", yamlData)
 
-	config := &Config{}
+	config := &config{}
 
 	err = yaml.Unmarshal(yamlData, &config)
 	if err != nil {
-		return nil, fmt.Errorf("can't decode yaml: %s", err)
+		return nil, nil, fmt.Errorf("can't decode yaml: %s", err)
 	}
 
 	//read name from key of action directive
@@ -45,23 +52,7 @@ func getConfig(path string) (*Config, error) {
 		rule.regexps = map[string]*regexp.Regexp{}
 	}
 
-	return config, nil
-}
-
-func (config *Config) Validate() error {
-	for _, rule := range *config.Rules {
-		for _, action := range rule.Workflow {
-			if _, ok := config.Actions[action]; !ok {
-				return fmt.Errorf("undefined action in workflow: '%s'", action)
-			}
-		}
-	}
-
-	return nil
-}
-
-func (config *Config) Initialize() (map[string]Action, *Rules, error) {
-	err := config.Validate()
+	err = config.validate()
 	if err != nil {
 		return nil, nil, fmt.Errorf("invalid config: %s", err)
 	}
@@ -72,4 +63,16 @@ func (config *Config) Initialize() (map[string]Action, *Rules, error) {
 	}
 
 	return config.Actions, config.Rules, nil
+}
+
+func (config *config) validate() error {
+	for _, rule := range *config.Rules {
+		for _, action := range rule.Workflow {
+			if _, ok := config.Actions[action]; !ok {
+				return fmt.Errorf("undefined action in workflow: '%s'", action)
+			}
+		}
+	}
+
+	return nil
 }
