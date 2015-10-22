@@ -125,6 +125,7 @@ func main() {
 
 		if err != nil {
 			log.Println(err.Error())
+			log.Println() // add empty line for pretty output
 			if !force {
 				os.Exit(1)
 			}
