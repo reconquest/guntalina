@@ -14,16 +14,24 @@ var (
 )
 
 const (
-	usage = `Guntalina
+	usage = `Guntalina 1.0
+
+Guntalina is the utility for creating and executing command list basing on list
+of modified files, which can be created, for example, by Guntalina's brother Gunter.
 
 Usage:
-	guntalina [options] -s <source> -c <config>
+    guntalina [options] -s <source>
+    guntalina -h | --help
+    guntalina -v | --version
 
 Options:
-	-s <source>    Source file
-	-c <config     Config file
-	-r --dry-run   Dry-run mode, in this mode commands will be not really executed.
-	-f --force     Do not stop if any command has been failed.
+    -s <source>    Specify source file, which should consist of list of
+                   modified/overwrited/created files.
+    -c <config     Specify configuration file [default: /etc/guntalina/guntalina.conf].
+    -r --dry-run   Dry-run mode, in this mode commands will be not really executed.
+    -f --force     Do not stop if any command has been failed.
+    -v --version   Show guntalina version.
+    -h --help      Show this screen.
 `
 )
 
