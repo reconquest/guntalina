@@ -80,6 +80,9 @@ func main() {
 		return
 	}
 
+	// prevent double execution
+	workflow = uniqueWorkflow(workflow)
+
 	log.Println("following actions will be executed:")
 
 	commands := []string{}
@@ -127,4 +130,25 @@ func main() {
 			}
 		}
 	}
+}
+
+func uniqueWorkflow(workflow []string) []string {
+	unique := []string{}
+	for _, action := range workflow {
+		found := false
+		for _, item := range unique {
+			if item == action {
+				found = true
+				break
+			}
+		}
+
+		if found {
+			continue
+		}
+
+		unique = append(unique, action)
+	}
+
+	return unique
 }

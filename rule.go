@@ -31,6 +31,7 @@ func (rules *Rules) SetProcessed(rule *Rule) {
 }
 
 func (rule *Rule) setProcessed() {
+	fmt.Printf("XXXXXX rule.go:35: rule: %#v\n", rule)
 	rule.processed = true
 }
 

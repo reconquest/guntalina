@@ -15,7 +15,6 @@ DATA
 
 confd "good" "actions" <<DATA
     reload-something:
-        description: tests action which should be run once
         commands:
             - echo command_1
             - echo command_2
@@ -23,7 +22,6 @@ DATA
 
 confd "bad" "actions" <<DATA
     should-be-not-executed:
-        description: test action which should be not executed
         commands:
             - echo something went wrong
 DATA

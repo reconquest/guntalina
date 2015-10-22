@@ -4,7 +4,7 @@ init
 
 config <<DATA
 actions:
-    restart-software:
+    reload-software:
         commands:
             - echo executed
 
@@ -29,17 +29,13 @@ tests_ensure run
 
 tests_ensure assert_diff <<DATA
 following actions will be executed:
-reload-something
-    echo command_1
-    echo command_2
+reload-software
+    echo executed
 
 following commands will be executed:
-echo command_1
-echo command_2
+echo executed
 
-executing: echo command_1
-command_1
+executing: echo executed
+executed
 
-executing: echo command_2
-command_2
 DATA
