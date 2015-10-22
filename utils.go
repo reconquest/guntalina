@@ -3,32 +3,23 @@ package main
 import (
 	"fmt"
 	"os/exec"
-	"strings"
+
+	"github.com/mattn/go-shellwords"
 )
 
-func execute(cmd *exec.Cmd) (string, error) {
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		switch err.(type) {
-		case *exec.ExitError:
-			if len(output) > 0 {
-				return "", fmt.Errorf(
-					"executing %s failed: %s, output: %s",
-					strings.Join(cmd.Args, " "), err, output,
-				)
-			}
+func execute(cmdline string) (string, error) {
+	parser := shellwords.NewParser()
+	parser.ParseBacktick = false
+	parser.ParseEnv = true
 
-			return "", fmt.Errorf(
-				"executing %s failed: %s, output is empty",
-				strings.Join(cmd.Args, " "), err,
-			)
-		default:
-			return "", fmt.Errorf(
-				"executing %s failed: %s",
-				strings.Join(cmd.Args, " "), err,
-			)
-		}
+	args, err := parser.Parse(cmdline)
+	if err != nil {
+		return "", fmt.Errorf("can't parse command: %s", err)
 	}
 
-	return string(output), nil
+	cmd := exec.Command(args[0], args[1:]...)
+
+	output, err := cmd.CombinedOutput()
+
+	return string(output), err
 }

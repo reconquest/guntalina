@@ -2,37 +2,26 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"path/filepath"
 	"regexp"
-	"strings"
 
 	"gopkg.in/yaml.v2"
 )
 
-var (
-	reInclude = regexp.MustCompile(
-		`(.*)?!include\s+(.*)`,
-	)
-)
-
 type Config struct {
 	Actions map[string]Action `yaml:"actions"`
-	Rules   []Rule            `yaml:"rules"`
+	Rules   *Rules            `yaml:"rules"`
 }
 
 func getConfig(path string) (*Config, error) {
-	yamlData, err := ioutil.ReadFile(path)
+	yamlData, err := loadYaml(path, filepath.Dir(path))
 	if err != nil {
 		return nil, err
 	}
 
-	yamlData, err = invokeIncludes(yamlData, filepath.Dir(path))
-	if err != nil {
-		return nil, err
-	}
+	//uncomment for debug
+	//fmt.Printf("%s", yamlData)
 
-	//config := map[string]interface{}{}
 	config := &Config{}
 
 	err = yaml.Unmarshal(yamlData, &config)
@@ -46,81 +35,41 @@ func getConfig(path string) (*Config, error) {
 		config.Actions[actionName] = action
 	}
 
+	// it can be nil if the configuration file have not 'rules:' directive
+	if config.Rules == nil {
+		config.Rules = &Rules{}
+	}
+
+	// create regexp map, rule here accessible by reference
+	for _, rule := range *config.Rules {
+		rule.regexps = map[string]*regexp.Regexp{}
+	}
+
 	return config, nil
 }
 
-func invokeIncludes(yamlData []byte, baseDir string) ([]byte, error) {
-	yamlString := string(yamlData)
-
-	matches := reInclude.FindAllStringSubmatch(yamlString, -1)
-	if len(matches) == 0 {
-		return yamlData, nil
+func (config *Config) Validate() error {
+	for _, rule := range *config.Rules {
+		for _, action := range rule.Workflow {
+			if _, ok := config.Actions[action]; !ok {
+				return fmt.Errorf("undefined action in workflow: '%s'", action)
+			}
+		}
 	}
 
-	for _, match := range matches {
-		var (
-			rawLine   = match[0]
-			rawIndent = match[1]
-			pattern   = match[2]
-		)
+	return nil
+}
 
-		if !strings.HasPrefix(pattern, "/") {
-			pattern = filepath.Join(baseDir, pattern)
-		}
-
-		files, err := filepath.Glob(pattern)
-		if err != nil {
-			return nil, fmt.Errorf(
-				"can't glob by pattern '%s': %s",
-				pattern, err,
-			)
-		}
-
-		var including string
-		for _, file := range files {
-			fileData, err := ioutil.ReadFile(file)
-			if err != nil {
-				return nil, fmt.Errorf(
-					"can't include by pattern '%s': %s", pattern, err,
-				)
-			}
-
-			including = string(fileData) + "\n"
-		}
-
-		if len(rawIndent) > 0 {
-			level := 0
-			nextLevel := false
-			if string(rawIndent[0]) == " " {
-				trimmed := strings.TrimLeft(rawIndent, " ")
-				spaces := len(rawIndent) - len(trimmed)
-				level = spaces / 4
-
-				if trimmed != "" {
-					level = level + 1
-					nextLevel = true
-				}
-			}
-
-			lines := strings.Split(including, "\n")
-			for i, line := range lines {
-				if !nextLevel && i == 0 {
-					continue
-				}
-
-				lines[i] = strings.Repeat(" ", level*4) + line
-			}
-
-			including = strings.Join(lines, "\n")
-			if nextLevel {
-				including = "\n" + including
-			}
-
-			including = rawIndent + including
-		}
-
-		yamlString = strings.Replace(yamlString, rawLine, including, -1)
+func (config *Config) Initialize() (map[string]Action, *Rules, error) {
+	err := config.Validate()
+	if err != nil {
+		return nil, nil, fmt.Errorf("invalid config: %s", err)
 	}
 
-	return []byte(yamlString), nil
+	err = config.Rules.Compile()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return config.Actions, config.Rules, nil
 }
