@@ -11,10 +11,7 @@ import (
 
 var (
 	version = "1.0"
-)
-
-const (
-	usage = `Guntalina 1.0
+	usage   = `Guntalina ` + version + `
 
 Guntalina is the utility for creating and executing command list basing on list
 of modified files, which can be created, for example, by Guntalina's brother Gunter.
