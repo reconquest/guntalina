@@ -74,13 +74,12 @@ rules:
 So, action `nginx-reload` will be triggered if `/etc/nginx/nginx.conf` or some
 file in `/etc/nginx/conf.d/` directive has been changed.
 
-When **guntalina** passes
-through the list of modified files and list of rules, she disables rules after
-their using, so if you have two or more modified files which fit a rule,
-guntalina will execute rule workflow once.
+When **guntalina** passes through the list of modified files and list of rules,
+she disables rules after their using, so if you have two or more modified files
+which fit a rule, guntalina will execute rule workflow once.
 
-Actually, if rule contains the `group` directive, then guntalina will disable all
-rules with same group.
+Actually, if rule contains the `group` directive, then guntalina will disable
+all rules with same group.
 
 Also, if you have some rules, which
 has repeatable workflow actions, guntalina will execute actions only once.
