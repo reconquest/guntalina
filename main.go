@@ -11,10 +11,11 @@ import (
 
 var (
 	version = "1.0"
-	usage   = `Guntalina ` + version + `
+	usage   = `guntalina ` + version + `
 
-Guntalina is the utility for creating and executing command list basing on list
-of modified files, which can be created, for example, by Guntalina's brother Gunter.
+guntalina is the tool for creating and executing command list basing on list of
+modified files, which can be created, for example, by guntalina's brother
+gunter.
 
 Usage:
     guntalina [options] -s <source>
@@ -22,12 +23,13 @@ Usage:
     guntalina -v | --version
 
 Options:
-    -s <source>    Specify source file, which should consist of list of
+    -s <source>    Specify source file, which is the list of
                    modified/overwrited/created files.
     -c <config     Specify configuration file [default: /etc/guntalina/guntalina.conf].
-    -r --dry-run   Dry-run mode, in this mode commands will be not really executed.
-    -f --force     Do not stop if any command has been failed.
-    -v --version   Show guntalina version.
+    -r --dry-run   Dry-run mode, in this mode commands will not be executed,
+                   but printed on the stderr.
+    -f --force     Do not stop if any command failed.
+    -v --version   Show guntalina's version.
     -h --help      Show this screen.
 `
 )
