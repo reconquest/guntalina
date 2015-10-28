@@ -60,19 +60,19 @@ func main() {
 	}
 
 	workflow := []string{}
-	for _, modification := range modifications {
-		rule, err := rules.GetRule(modification)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if rule == nil {
+	for _, rule := range *rules {
+		if rule.processed {
 			continue
 		}
 
-		workflow = append(workflow, rule.Workflow...)
+		for _, modification := range modifications {
+			if rule.Match(modification) {
+				workflow = append(workflow, rule.Workflow...)
 
-		rules.SetProcessed(rule)
+				rules.SetProcessed(rule)
+				break
+			}
+		}
 	}
 
 	if len(workflow) == 0 {

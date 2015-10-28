@@ -56,19 +56,13 @@ func (rules *Rules) Compile() error {
 	return nil
 }
 
-func (rules *Rules) GetRule(modification string) (*Rule, error) {
-	for _, rule := range *rules {
-		if rule.processed {
-			continue
-		}
-
-		for _, re := range rule.regexps {
-			match := re.MatchString(modification)
-			if match {
-				return rule, nil
-			}
+func (rule *Rule) Match(modification string) bool {
+	for _, re := range rule.regexps {
+		match := re.MatchString(modification)
+		if match {
+			return true
 		}
 	}
 
-	return nil, nil
+	return false
 }
