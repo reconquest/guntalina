@@ -25,7 +25,7 @@ Usage:
 Options:
     -s <source>    Specify source file, which is the list of
                    modified/overwrited/created files.
-    -c <config     Specify configuration file [default: /etc/guntalina/guntalina.conf].
+    -c <config>    Specify configuration file [default: /etc/guntalina/guntalina.conf].
     -r --dry-run   Dry-run mode, in this mode commands will not be executed,
                    but printed on the stderr.
     -f --force     Do not stop if any command failed.
