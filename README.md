@@ -46,15 +46,18 @@ Let's write some typical actions for `nginx reload` and `nginx restart`:
 
 ```yaml
 actions:
-    - nginx-reload:
+    nginx-reload:
         commands:
             - systemctl reload nginx
 
-    - nginx-restart:
+    nginx-restart:
         commands:
             - nginx -t # let's force check nginx config before real restart
             - systemctl restart nginx
 ```
+
+> Note: actions section should be described as associative array
+> (object), that's mean action name must not starts with `-`.
 
 #### Rules
 
@@ -103,13 +106,13 @@ For this case `group` directive should be used:
 
 ```yaml
 actions:
-    - exampled-restart:
+    exampled-restart:
         commands:
             - exampled --check-config
             - examplectl stop
             - examplectl start
 
-    - exampled-reload:
+    exampled-reload:
         commands:
             - examplectl reload
 
@@ -131,6 +134,9 @@ How you can see, both rules uses *group* directive which has `exampled`
 value. It means, that **guntalina** will not run `exampled-reload`, if
 `exampled-restart` already triggered, because after triggering
 `exampled-restart` group `exampled` will be disabled.
+
+> Note: rules section should be described as non-indexed array, that's mean
+> rule item must starts with `-`.
 
 #### Includes
 
